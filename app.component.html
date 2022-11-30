@@ -1,0 +1,332 @@
+<script type="text/javascript">
+	var utm   = 60853;
+	var uf    = 34806.01;  
+	var imm   = 400000;
+	var topeImponibleCotizacionesUF = 81.7;
+	var topeImponibleSeguroUF       = 122.7;
+  
+  var afpFeeData = {"capital":"0.0144","cuprum":"0.0144","habitat":"0.0127","modelo":"0.0058","planvital":"0.0116","provida":"0.0145","uno":"0.0069","primer trabajo":"0.0058","no cotiza":"0.0000"};
+var impuestoUTMdata = [{"desde":"0.0","hasta":"13.5","factor":"0.000","rebaja":"0.00"},{"desde":"13.5","hasta":"30.0","factor":"0.040","rebaja":"0.54"},{"desde":"30.0","hasta":"50.0","factor":"0.080","rebaja":"1.74"},{"desde":"50.0","hasta":"70.0","factor":"0.135","rebaja":"4.49"},{"desde":"70.0","hasta":"90.0","factor":"0.230","rebaja":"11.14"},{"desde":"90.0","hasta":"120.0","factor":"0.304","rebaja":"17.80"},{"desde":"120.0","hasta":"310.0","factor":"0.350","rebaja":"23.32"},{"desde":"310.0","hasta":"99999999.0","factor":"0.400","rebaja":"38.82"}];
+</script>
+
+<div class="row">
+  <form id="formularioGenerarSueldoLiquidoPDF" name="formularioGenerarSueldoLiquidoPDF" action="descargar-simulacion-sueldo-liquido" method="post" class="col s12">
+
+    <div class="row">
+      <div class="col s12 m12 l10 xl10" style="padding-left:0;padding-right:0">
+
+        <div class="input-field col s4 m4">
+          <input id="utm" name="utm" type="text" readonly="readonly">
+          <label for="utm"><i class="material-icons tiny icon-grey">lock</i> UTM <span class="hide-on-small-only ">01-11-22</span></label>
+        </div>
+
+        <div class="input-field col s4 m4">
+          <input id="uf" name="uf" type="text" readonly="readonly">
+          <label for="uf"><i class="material-icons tiny icon-grey">lock</i> UF <span class="hide-on-small-only ">29-11-22</span></label>
+        </div>
+
+        <div class="input-field col s4 m4">
+          <input id="imm" name="imm" type="text" readonly="readonly">
+          <label for="imm"><i class="material-icons tiny icon-grey">lock</i> IMM <span class="hide-on-small-only ">01-08-22</span></label>
+        </div>
+
+      </div>
+    </div> <!-- cierre row container de constantes y bases -->
+
+    <div class="row">
+      <div class="col s12 m12 l10 xl10" style="padding-left:0;padding-right:0">
+        <div class="card" style="overflow: hidden;">
+          <div class="card-content" style="padding:0px 0px 5px 0px;">
+
+              <div class="card-action teal grey lighten-5" style="overflow:hidden;padding:5px;margin-bottom: 5px;">
+               <i class="material-icons prefix icon-grey left">settings</i>
+               <p style="font-weight:bold;color:#9e9e9e;">Contrato</p>
+              </div> 
+
+              <div class="input-field col s6">
+                <select id="plazoContrato" name="plazoContrato"> 
+                  <option value="Mensual" selected="selected">Mensual</option><option value="Quincenal">Quincenal</option><option value="Semanal">Semanal</option><option value="Diario">Diario</option>                </select>
+                <label class="valign-wrapper">
+                  Contrato
+                </label>
+              </div>
+
+              <div class="input-field col s6">
+                <select id="plazoContratoSelect" name="plazoContratoSelect"> 
+                  <option value="indefinido" selected="selected">Indefinido</option>
+                  <option value="fijo">Fijo</option>
+                </select>
+                <label class="valign-wrapper">
+                  Plazo contrato
+                </label>
+              </div> 
+
+            <div class="col s12 m6 l6 xl6 right-dashed-border" style="padding-left: 0px;padding-right: 0px;">   
+              
+              <div class="card-action teal grey lighten-5" style="overflow:hidden;padding:5px;margin-bottom: 5px;">
+               <i class="material-icons prefix icon-lightgreen left">arrow_drop_down_circle</i>
+               <p style="font-weight:bold;color:#9e9e9e;">Haberes</p>
+              </div>  
+
+              <div style="padding:5px">
+                    
+              <div class="input-field col s6 m6">
+                <input id="sueldoBase" name="sueldoBase" type="text" placeholder="Sin puntos" required="required">
+                <label class="valign-wrapper">
+                  Sueldo base&nbsp;
+                  <i class="material-icons tiny icon-grey tooltipped input-icon-top-left" data-position="top" data-tooltip="No puede ser menos que el sueldo mínimo.<br>Si tu sueldo base ya tiene incluida la gratificación, favor quitar el item de gratificación.">info_outline</i> 
+                </label>
+              </div>
+
+              <div class="input-field col s6 m6">
+                <select id="tipoAusencia" name="tipoAusencia"> 
+                  <option value="no" selected="selected">No</option>
+                  <option value="licencia">Si, Licencia</option> 
+                  <option value="ausencia">Si, Ausencia</option> 
+                  <option value="fraccion">Si, Fracción</option>                
+                </select>
+                <label class="valign-wrapper">
+                  Días ausente&nbsp;
+                  <i class="material-icons tiny icon-grey tooltipped select-icon-top-left" data-position="top" data-tooltip="<b>Licencia:</b> días ausentes por licencia médica. <br><b>Ausencia:</b> para otras ausencias no justificadas. <br><b>Fracción:</b> comienzo de trabajo durante el mes. ">info_outline</i>
+                </label>
+              </div> 
+
+              <div id="showDiasAusentes" class="input-field col s12 m12" style="display:none">
+                <input id="diasAusentes" name="diasAusentes" type="number" placeholder="Cantidad de días" min="0" max="30">
+                <label class="valign-wrapper">
+                  Cantidad días ausente
+                </label>
+              </div>
+
+              <input type="hidden" name="sueldoBaseDias" id="sueldoBaseDias" value="">
+
+              <div class="input-field col s6 m6">
+                <select id="gratificacionSelect" name="gratificacionSelect"> 
+                  <option value="incluir" selected="selected">Si</option>
+                  <option value="noincluir">No</option> 
+                  <option value="manual">Editar</option>                
+                </select>
+                <label class="valign-wrapper">
+                  Gratificación
+                </label>
+              </div>   
+
+              <div class="input-field col s6 m6" >
+                <input id="gratificacion" name="gratificacion" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Al incluir, automáticamente se calcula el 25% del sueldo base o 4,75 sueldos mínimos mensuales y mensualizado. Lo que sea menor.">
+                  Valor grat.&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>       
+
+              <div class="input-field col s6 m6">
+                <input id="horasExtra" name="horasExtra" type="text" placeholder="Cantidad">
+                <label class="valign-wrapper">
+                  Horas extra.
+                </label>
+              </div>
+              
+              <div class="input-field col s6 m6" >
+                <input id="horasextrascalc" name="horasextrascalc" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Horas extraordinarias calculadas para un trabajador con jornada de 45 horas semanales y con un recargo del 50%.">
+                  Valor hrs. extra.&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>
+
+              <div class="input-field col s12 m12">
+                <input id="comisiones" name="comisiones" type="text" placeholder="(opcional)">
+                <label>Comisiones</label>
+              </div>
+
+              <div class="input-field col s12 m12">
+                <input id="semanaCorrida" name="semanaCorrida" type="text" placeholder="(opcional)">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Si no sabes calcular la semana corrida te recomendamos<br> usar nuestra <b>calculadora de semana corrida</b><br> que encontrarás en el menú">
+                  Semana Corrida&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>
+
+              <div class="input-field col s12 m12">
+                <input id="bono" name="bono" type="text" placeholder="(opcional)">
+                <label>Bonos</label>
+              </div>
+
+              <div class="input-field col s6 m6">
+                <input id="colacion" name="colacion" type="text" placeholder="(opcional)">
+                <label>Colación</label>
+              </div>
+
+              <div class="input-field col s6 m6">
+                <input id="movilizacion" name="movilizacion" type="text" placeholder="(opcional)">
+                <label>Movilización</label>
+              </div> 
+
+              <div class="input-field col s12 m12">
+                <input id="asignacionFamiliar" name="asignacionFamiliar" type="text" placeholder="(opcional)">
+                <label>Asignación familiar</label>
+              </div>         
+              </div>
+            </div> <!-- cierre col -->
+
+            <div class="col s12 m6 l6 xl6" style="padding-left:0px;padding-right:0px">
+             
+              <div class="card-action teal grey lighten-5" style="overflow:hidden;padding:5px;margin-bottom: 5px;">
+                <i class="material-icons prefix icon-red left">arrow_drop_down_circle</i><p style="font-weight:bold;color:#9e9e9e;">Descuentos</p>
+              </div>            
+
+              <div style="padding:5px;">
+
+              <div class="input-field col s6 m6">
+                <select id="afp" name="afp" required="required"> 
+                  <!--<option disabled="disabled" selected="selected" value="">Seleccionar</option>-->
+                  <option value="capital">Capital</option>
+<option value="cuprum">Cuprum</option>
+<option value="habitat">Habitat</option>
+<option value="modelo">Modelo</option>
+<option value="planvital">Planvital</option>
+<option value="provida">Provida</option>
+<option value="uno">Uno</option>
+<option value="primer trabajo">Primer trabajo</option>
+<option value="no cotiza">No cotiza</option>
+                </select>
+                <label class="valign-wrapper">
+                  AFP
+                </label>
+              </div>
+
+              <div class="input-field col s6 m6">           
+                <input id="afpcalc" name="afpcalc" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Corresponde al 10% de previsión más el porcentaje correspondiente a comisión de la AFP.">
+                  Total AFP&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>   
+
+              <input type="hidden" name="comisionafp" id="comisionafp" value="">
+              <input type="hidden" name="comisionafpcalc" id="comisionafpcalc" value="">
+
+              <div class="input-field col s6 m6">
+                <select id="fonasaisapreselect" name="fonasaisapreselect"> 
+                  <option value="fonasa" selected="selected">Fonasa 7%</option>
+                  <option value="isapre">Isapre UF</option>
+                </select>
+                <label class="valign-wrapper">
+                  Previsión
+                </label>
+              </div>
+
+              <div class="input-field col s6 m6">
+                <input id="fonasaisaprecalc" name="fonasaisaprecalc" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Corresponde al 7% de la base imponible o en el caso de Isapres es un monto pactado en UF.">
+                  Total salud&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>
+
+              <input type="hidden" name="isaprecalc" id="isaprecalc" value="">
+
+              <div class="input-field col s12">
+                <input id="seguro" name="seguro" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Corresponde al 0,6% de la base imponible para el seguro de cesantía en el caso de contratos plazo indefinido."> 
+                  Seguro de cesantía&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+              </div>
+
+              <div class="input-field col s12">
+                <input id="impuesto" name="impuesto" type="text" placeholder="-" readonly="readonly">
+                <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="El impuesto único de segunda categoría se calcula en escalas dependiendo de la base tributable, siempre y cuando la base tributable sea mayor a 13.5 UTM mensual."> 
+                  Impuesto&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                </label>
+                <!-- <i class="material-icons prefix icon-blue input-icon-right">help_outline</i> -->
+              </div>
+
+              <div class="input-field col s12 m12">
+                <input id="apv" name="apv" type="text" placeholder="(opcional)">
+                <label for="apv" class="valign-wrapper tooltipped" data-position="top" data-tooltip="Ahorro previsional voluntario">
+                  APV&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i></label>
+              </div>  
+
+              <div class="input-field col s12 m12">
+                <input id="otrosdescuentosLeg" name="otrosdescuentosLeg" type="text" placeholder="(opcional)">
+                <label for="otrosdescuentosLeg" class="valign-wrapper tooltipped" data-position="top" data-tooltip="Otros descuentos legales como Pensión alimenticia (dictada por juez), Aporte sindicato, entre otros.">
+                  Otros descuentos legales&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i></label>
+              </div> 
+
+              <div class="input-field col s12 m12">
+                <input id="otrosdescuentos" name="otrosdescuentos" type="text" placeholder="(opcional)">
+                <label for="otrosdescuentos" class="valign-wrapper tooltipped" data-position="top" data-tooltip="Otros descuentos voluntarios como: Anticipos varios, Préstamos, Créditos a la Caja de Compensación, entre otros.">
+                  Otros descuentos&nbsp;
+                  <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i></label>
+              </div>  
+
+            </div>
+            </div> <!-- cierre col -->
+
+            <div class="col s12 m12 l12 xl12" id="detalle" style="padding-left:0;padding-right:0; display: none;">
+              <div class="card-action white" style="overflow:hidden;padding:5px;border-top:1px dashed #c3c0c0;">
+                
+                <div class="input-field col s6 m4">
+                  <input id="baseImponible" name="baseImponible" type="text" placeholder="-" readonly="readonly">
+                  <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Es la base de dinero de donde se descontará un porcentaje de previsión AFP y salud Isapre. Corresponde al sueldo base siempre y cuando no sea mayor a 81.7 UF; De ser mayor se calcula en base a este último"> 
+                    Base Imponible&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div>
+
+                <div class="input-field col s6 m4">
+                  <input id="baseImponibleSeguro" name="baseImponibleSeguro" type="text" placeholder="-" readonly="readonly">
+                  <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Es la base de dinero de donde se descontará un porcentaje para el seguro de cesantía. Corresponde al sueldo base siempre y cuando no sea mayor a 122.7 UF; De ser mayor se calcula en base a este último."> 
+                    Base Imp. seguro&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div>
+
+                <div class="input-field col s12 m4">
+                  <input id="baseTributable" name="baseTributable" type="text" placeholder="-" readonly="readonly">
+                  <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Corresponde a la base de dinero de donde se calcula el impuesto. Se calcula del sueldo bruto menos los descuentos."> 
+                    Base tributable&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div>
+
+              </div> <!-- cierre card action -->
+            </div> <!-- cierre col de card action -->
+
+            <div class="col s12 m12 l12 xl12" style="padding-left:0;padding-right:0">
+              <div class="card-action grey lighten-5" style="overflow:hidden;padding:5px;border-top:1px dashed #c3c0c0;">
+                <div class="input-field col s6 m4 l4 xl4">
+                  <i class="material-icons prefix icon-lightgreen">add_circle</i>
+                  <input id="totalHaberes" name="totalHaberes" type="text" readonly="readonly" placeholder="-">
+                  <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Es el dinero que desembolsa el empleador por el empleado. También conocido como sueldo bruto.">
+                    Haberes&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div>
+
+                <div class="input-field col s6 m4 l4 xl4">
+                  <i class="material-icons prefix icon-red">remove_circle</i> 
+                  <input id="descuentos" name="descuentos" type="text" readonly="readonly" placeholder="-">
+                  <label class="valign-wrapper tooltipped" data-position="top" data-tooltip="Corresponde a todos los descuentos realizados al Total haberes">
+                    Descuentos&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div>
+
+                <div class="input-field col s12 m4 l4 xl4">
+                  <i class="material-icons prefix icon-green">monetization_on</i>
+                  <input id="sueldoLiquido" name="sueldoLiquido" class="green-text text-darken-4" type="text" readonly="readonly" placeholder="-">
+                  <label class="valign-wrapper green-text text-darken-4 tooltipped" data-position="top" data-tooltip="Corresponde al sueldo que finalmente recibirás en tu bolsillo. <br> Líquido = Total haberes - Descuentos">
+                    Sueldo líquido&nbsp;
+                    <i class="material-icons tiny icon-grey input-icon-top-left">info_outline</i>
+                  </label>
+                </div> 
+              </div> <!-- cierre card action -->
+            </div> <!-- cierre col de card action -->
+
+          </div> <!-- cierre card content -->
+        </div> <!-- cierre card -->
